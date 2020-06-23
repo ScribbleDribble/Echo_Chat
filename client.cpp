@@ -36,8 +36,9 @@ public:
 
 int main(int argc, char *argv[]) {
     
-    if (argc > 2) {
-        std::cerr << "Usage: exe <port_no>" << std::endl;
+    if (argc != 2) {
+        std::cerr << "Usage: ./client <port_no>" << std::endl;
+        exit(0);
     }
     
     try {
@@ -54,6 +55,8 @@ int main(int argc, char *argv[]) {
         boost::asio::streambuf buf;
         std::ostream os(&buf);
         char msg[Message::max_body_size + 1];
+
+        
         while (std::cin.getline(msg, Message::max_body_size + 1)) {
             boost::system::error_code ec;
 
@@ -61,9 +64,8 @@ int main(int argc, char *argv[]) {
             
             user_message = msg;
             os << user_message.append("#");
-            std::cout << user_message << std::endl;
             client.write(buf);
-
+            io_context.run();
 
 
             if (ec == boost::asio::error::eof) {
