@@ -1,6 +1,8 @@
 #include "connection.h"
 
 
+
+
 void Connection::start_read() {
     try {
         while (true) {
@@ -12,8 +14,10 @@ void Connection::start_read() {
         auto read_len = boost::asio::read_until(socket, read_buffer, "#");
         if (!ec) {
             std::string msg = Message::remove_delimiter(Message::get_string_from_buf(read_buffer));
-            std::cout << msg << std::endl;
-            server.print_connections();
+            // std::cout << msg << std::endl;
+            
+            room->broadcast(msg);
+            
         }
     
         if (ec == boost::asio::error::eof) {
@@ -22,6 +26,9 @@ void Connection::start_read() {
         // FREEZES
         // boost::asio::async_read_until(socket, read_buffer, "#", boost::bind(&Connection::handle_read, this));
         // io_context.run();
+
+        // POTENTIAL FIX?
+        // boost::asio::async_read_until(socket, read_buffer, "#", boost::bind(&Connection::handle_read, shared_from_this());
         }
         // room.broadcast(msg);
 
@@ -33,5 +40,31 @@ void Connection::start_read() {
     catch(std::exception& e) {
         std::cout << e.what() << std::endl;
     }
-    
-};
+
+}
+
+void Connection::write(std::string msg) {
+    boost::system::error_code ec;
+    boost::asio::streambuf buf;
+    std::ostream os(&buf);
+
+    buf.consume(buf.size());
+    os << msg.append("#");
+
+
+    boost::asio::async_write(socket, boost::asio::buffer(buf.data(),
+            Message::max_body_size + 1),boost::bind(&Connection::write_success, shared_from_this()));
+}
+
+void Connection::write_success() {
+
+}
+
+//void House::send(const std::string& room_name, const std::string& msg) {
+//    Chat_Room::room_ptr room = room_map[room_name];
+////    room.broadcast(msg);
+//}
+//
+//void House::add_room(const std::string& room_name) {
+////    room_map[room_name] = Chat_Room::create_room(room_name);
+//}

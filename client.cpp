@@ -29,6 +29,14 @@ public:
         boost::asio::async_write(socket, boost::asio::buffer(buf.data(), Message::max_body_size + 1), boost::bind(&Client::print, this));
     }
 
+    void msg_read(boost::asio::streambuf& buf) {
+        auto read_len = boost::asio::read_until(socket, buf, "#");
+
+        std::string msg = Message::remove_delimiter(Message::get_string_from_buf(buf));
+        std::cout << msg << std::endl;
+
+    }
+
     void print() {
         std::cout << "Write successful" << std::endl;
     }
@@ -65,8 +73,8 @@ int main(int argc, char *argv[]) {
             user_message = msg;
             os << user_message.append("#");
             client.write(buf);
+            client.msg_read(buf);
             io_context.run();
-
 
             if (ec == boost::asio::error::eof) {
                 std::cerr << "eof error, closing." << std::endl;
