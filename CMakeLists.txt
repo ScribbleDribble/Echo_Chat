@@ -13,3 +13,5 @@ include_directories(${../libraries/boost_1_73_0})
 
 
 TARGET_LINK_LIBRARIES(server pthread)
+
+

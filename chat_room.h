@@ -10,23 +10,20 @@ private:
 
 public:
 
-
     void broadcast(const std::string& msg) override {
         std::cout << connections.size() << std::endl;
         for (auto & connection : connections) {
-            std::cout << "done" << std::endl;
             connection->write("<" + name + ">: " + msg);
         }
     }
 
     static room_ptr create_room(const std::string& room_name) {
-        Room* room = new Chat_Room(room_name);
         // need to check if room name already exists
-        return room_ptr(room);
+        return room_ptr((Room *)(new Chat_Room(room_name)));
 
     }
 
-    void add_user(const boost::shared_ptr<Chat_User>& client_ptr) {
+    void add_user(const boost::shared_ptr<Chat_User>& client_ptr) override {
         connections.push_back(client_ptr);
     }
 //
