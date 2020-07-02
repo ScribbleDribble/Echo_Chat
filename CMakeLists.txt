@@ -9,6 +9,8 @@ add_executable(
 	server.cpp
 	connection.cpp
          connection.h room.h chat_room.h)
+
+add_executable(client client.cpp)
 include_directories(${../libraries/boost_1_73_0})
 
 

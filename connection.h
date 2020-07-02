@@ -1,7 +1,6 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-// two classes here to avoid circular dependency issue
 #include <utility>
 #include <vector>
 #include <map>
