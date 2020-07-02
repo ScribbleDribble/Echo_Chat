@@ -1,0 +1,12 @@
+*.out
+*.h.gch
+Makefile
+server
+client
+.cmake
+*.cbp
+CMakeFiles
+.vscode
+cmake-build-debug
+CMakeCache.txt
+*.cmake
