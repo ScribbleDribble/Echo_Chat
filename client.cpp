@@ -8,7 +8,6 @@
 
 
 using boost::asio::ip::tcp;
-typedef std::deque<Message> message_queue;
 
 class Client {
 private:
@@ -43,21 +42,11 @@ public:
         msg_queue.push_back(msg);
     }
 
-    void write() {
-        std::cout << "write" << std::endl;
-        boost::asio::post(io,
-                          [this]()
-                          {
-
-                                do_write();
-
-                          });
-    }
 
     void do_write() {
         boost::system::error_code ec;
-
         boost::asio::async_write(socket, buf, boost::bind(&Client::do_write, this));
+
 //        boost::asio::async_write(socket,
 //                                 boost::asio::buffer(msg_queue.front().data(),
 //                                                     msg_queue.front().length()),
@@ -90,24 +79,9 @@ public:
     void handle_read() {
         boost::system::error_code ec;
         if(!ec) {
-            buf.consume(buf.size());
+            buf.consume(Message::max_body_size);
             auto read_len = boost::asio::read_until(socket, buf, "#");
-//            boost::asio::async_read(socket,
-//                                    buf,
-//                                    [this](boost::system::error_code ec, std::size_t /*length*/)
-//                                    {
-//                                        if (!ec)
-//                                        {
-////                                            std::cout.write(buf.data(), Message::max_body_size);
-//                                            std::cout << Message::get_string_from_buf(buf) << std::endl;
-//                                            std::string msg = Message::remove_delimiter(Message::get_string_from_buf(buf));
-//                                            handle_read(ec, Message::max_body_size);
-//                                        }
-//                                        else
-//                                        {
-//
-//                                        }
-//                                    });
+
 
 //            boost::asio::async_read(socket, buf, boost::bind(&Client::handle_read, this,boost::asio::placeholders::error,
 //                                                             boost::asio::placeholders::bytes_transferred))
@@ -115,13 +89,17 @@ public:
 //                std::string msg = Message::remove_delimiter(Message::get_string_from_buf(buf));
 //            }
             /*Do Stuff*/
-//            boost::asio::async_read_until(socket, buf, "#", boost::bind(&Client::handle_read, this,
-//                                                                        boost::asio::placeholders::error,
-//                                                                        boost::asio::placeholders::bytes_transferred));
+//            boost::asio::async_read_until(socket, buf, "#", boost::bind(&Client::handle_read, this));
 
-            std::cout << Message::remove_delimiter("hey mate#") << std::endl;
-            std::string msg = Message::get_string_from_buf(buf);
-            std::cout << msg << std::endl;
+            if (!msg_queue.empty()) {
+                std::cout << "<You> " << msg_queue[0] << std::endl;
+                msg_queue.pop_front();
+            }
+            else {
+                std::string msg = Message::get_string_from_buf(buf);
+                std::cout << msg << std::endl;
+            }
+//
             handle_read();
 
 
@@ -166,12 +144,13 @@ int main(int argc, char *argv[]) {
             buf.consume(buf.size());
 
             user_message = msg;
+            client.queue_msg(user_message);
 
-//            client.queue_msg(user_message.append("#"));
             client.get_ostream() << user_message.append("#");
+
+
 //            client.write();
             client.do_write();
-//            client.handle_read(ec, Message::max_body_size);
             if (ec == boost::asio::error::eof) {
                 std::cerr << "eof error, closing." << std::endl;
             }

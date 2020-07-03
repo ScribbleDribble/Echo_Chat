@@ -52,7 +52,7 @@ void Connection::write(std::string msg) {
 
     os << msg.append("#");
     boost::asio::async_write(socket, boost::asio::buffer(buf.data(),
-            Message::max_body_size + 1),boost::bind(&Connection::write_success, shared_from_this()));
+            msg.size()),boost::bind(&Connection::write_success, shared_from_this()));
 
 }
 
