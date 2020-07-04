@@ -45,29 +45,12 @@ public:
 
     void do_write() {
         boost::system::error_code ec;
-        boost::asio::async_write(socket, buf, boost::bind(&Client::do_write, this));
-
-//        boost::asio::async_write(socket,
-//                                 boost::asio::buffer(msg_queue.front().data(),
-//                                                     msg_queue.front().length()),
-//                                 [this](boost::system::error_code ec, std::size_t /*length*/)
-//                                 {
-//                                     if (!ec)
-//                                     {
-//                                         msg_queue.pop_front();
-//                                         if (!msg_queue.empty())
-//                                         {
-//                                             do_write();
-//                                         }
-//                                     }
-//                                     else
-//                                     {
-//                                         socket.close();
-//                                     }
-//                                 });
-
-
-
+        if (!ec) {
+            boost::asio::async_write(socket, buf, boost::bind(&Client::do_write, this));
+        }
+        else {
+            std::cout << "Something went wrong with the connection!" << std::endl;
+        }
     }
 
     // TEMP
@@ -92,7 +75,7 @@ public:
 //            boost::asio::async_read_until(socket, buf, "#", boost::bind(&Client::handle_read, this));
 
             if (!msg_queue.empty()) {
-                std::cout << "<You> " << msg_queue[0] << std::endl;
+                std::cout << "\n" << "<You> " << msg_queue[0] << std::endl;
                 msg_queue.pop_front();
             }
             else {

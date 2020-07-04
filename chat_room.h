@@ -1,10 +1,24 @@
-class Chat_Room : public boost::enable_shared_from_this<Chat_Room>, Room{
+#ifndef CHAT_ROOM_H
+#define Chat_ROOM_H
+
+#include <utility>
+
+#include "room.h"
+#include "room_model.h"
+
+class Chat_Room : Room{
 private:
 
     std::vector<Chat_User::user_ptr> connections;
     std::string name;
+    Model::model_ptr model_ptr;
 
-    Chat_Room(const std::string& name): name(name){
+    Chat_Room(const std::string& name, Model::model_ptr model_ptr): name(name), model_ptr(std::move(model_ptr)){
+
+        // check for any existing rooms using sql query
+
+        // otherwise proceed to insert room into table
+
         std::cout << "You created the room: " << name << std::endl;
     }
 
@@ -17,9 +31,9 @@ public:
         }
     }
 
-    static room_ptr create_room(const std::string& room_name) {
+    static room_ptr create_room(const std::string& room_name, Model::model_ptr model_ptr) {
         // need to check if room name already exists
-        return room_ptr((Room *)(new Chat_Room(room_name)));
+        return room_ptr((Room *)(new Chat_Room(room_name, std::move(model_ptr))));
 
     }
 
@@ -32,12 +46,7 @@ public:
 //    }
 
 
-//    void add_user(Connection::conn_ptr client, int id): roomId(id){
-//
-//        connections.push_back(client);
-//        client->set_room(*this);
-//        std::cout << "You moved to: " << this->get_name() << std::endl;
-//    }
+
 
     std::string get_name() {
         return name;
@@ -75,3 +84,4 @@ public:
 
 
 };
+#endif

@@ -11,7 +11,6 @@
 #include <thread>
 #include <memory>
 
-
 using boost::asio::ip::tcp;
 
 class Server{
@@ -20,21 +19,17 @@ private:
 
     boost::asio::io_context& io_context;
     tcp::acceptor listening_socket;
-
     std::vector<Connection::conn_ptr> connections;
-    
 
 public:
-
-    Server(boost::asio::io_context& io_context, unsigned int port_no): io_context(io_context), listening_socket(io_context, tcp::endpoint(tcp::v4(), port_no)) {};
+    Server(boost::asio::io_context& io_context, unsigned int port_no): io_context(io_context),
+    listening_socket(io_context, tcp::endpoint(tcp::v4(), port_no)) {};
 
     void accept();
 
     void print_connections();
 
-
     ~Server();
-    
 
 };
 

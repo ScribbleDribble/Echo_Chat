@@ -1,8 +1,5 @@
 #include "connection.h"
 
-
-
-
 void Connection::start_read() {
     try {
         while (true) {
@@ -32,10 +29,6 @@ void Connection::start_read() {
             // boost::asio::async_read_until(socket, read_buffer, "#", boost::bind(&Connection::handle_read, shared_from_this());
             }
             // room.broadcast(msg);
-
-            // we now want to broadcast this message to other users in the same room
-
-        
 
     }
     catch(std::exception& e) {

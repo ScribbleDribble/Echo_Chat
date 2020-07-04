@@ -7,6 +7,7 @@
 #include <boost/asio.hpp>
 #include "chat_user.h"
 
+
 class Room {
 public:
     typedef boost::shared_ptr<Room> room_ptr;

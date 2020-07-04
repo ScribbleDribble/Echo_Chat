@@ -1,33 +1,30 @@
 #include "server.h"
 
     void Server::accept() {
-
         // init landing room
-        Room::room_ptr index_room = Chat_Room::create_room("Index");
-//        Chat_Room::room_ptr index_rm = index_room->get_shared();
+        Model::model_ptr model_ptr = Room_Model::create_model();
+        Room::room_ptr room = Chat_Room::create_room("Index", model_ptr);
+
         try {
             
             while(true) {
                 boost::system::error_code ec;
 
                 // give connection access to server contents
-                Connection::conn_ptr client_ptr = Connection::create_connection(io_context, index_room);
+                Connection::conn_ptr client_ptr = Connection::create_connection(io_context, room);
                 listening_socket.accept(client_ptr->get_socket());
 
                 Chat_User::user_ptr c_ptr = client_ptr->get_shared();
 
                 //add user to ground chat room
-                index_room->add_user(c_ptr);
+                room->add_user(c_ptr);
 
                 if (!ec) {
-//                    std::thread (boost::bind(&Connection::start_read, c)).detach();
-
                     std::thread ([client_ptr] { client_ptr->start_read(); }).detach();
                 }
             } 
         }
 
-    
         catch(std::exception& e) {
             std::cout<< "Error: " << e.what() << std::endl;       
         }
@@ -54,7 +51,6 @@ int main(int argc, char *argv[]) {
         Server server(io, std::stoi(argv[1]));
         io.run();
         server.accept();
-
     }
     
     catch(std::exception& e) {

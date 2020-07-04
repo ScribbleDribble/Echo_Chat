@@ -8,12 +8,12 @@ add_executable(
 	server
 	server.cpp
 	connection.cpp
-         connection.h room.h chat_room.h)
+         connection.h room.h chat_room.h sqlite3.h room_model.cpp model.h room_model.h room_model.cpp)
 
 add_executable(client client.cpp)
 include_directories(${../libraries/boost_1_73_0})
 
 
-TARGET_LINK_LIBRARIES(server pthread)
+TARGET_LINK_LIBRARIES(server pthread sqlite3)
 
 

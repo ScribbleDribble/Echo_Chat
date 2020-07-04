@@ -48,6 +48,8 @@ public:
     void write_success();
 
     ~Connection() {
+
+//        room->remove_user(*this);
         socket.close();
     }
 
