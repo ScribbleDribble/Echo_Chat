@@ -17,10 +17,17 @@ Room_Model::Room_Model() noexcept {
 
 void Room_Model::add(const std::string& room_name) {
     DB::insert_data(PATH, std::string("INSERT INTO ROOM (NAME) VALUES ('" + room_name + "');"));
-
 }
-void Room_Model::remove(const std::string & room_name)  {
+
+void Room_Model::map_insert(const std::string& room_name, Room::room_ptr room) {
+    house_map[room_name] = std::move(room);
+}
+void Room_Model::remove(const std::string& room_name)  {
     DB::insert_data(PATH, std::string("INSERT INTO ROOM (NAME) VALUES ('" + room_name + "');"));
+}
+
+Room::room_ptr Room_Model::get_room(const std::string& room_name) {
+    return house_map[room_name];
 }
 
 Model::model_ptr Room_Model::create_model() {

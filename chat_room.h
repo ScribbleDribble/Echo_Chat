@@ -6,14 +6,16 @@
 #include "room.h"
 #include "room_model.h"
 
-class Chat_Room : Room{
+class Chat_Room : public boost::enable_shared_from_this<Chat_Room>, public Room{
 private:
 
     std::vector<Chat_User::user_ptr> connections;
     std::string name;
-    Model::model_ptr model_ptr;
+    Model::model_ptr room_model_ptr;
 
-    Chat_Room(const std::string& name, Model::model_ptr model_ptr): name(name), model_ptr(std::move(model_ptr)){
+    Chat_Room(const std::string& name, Model::model_ptr model_ptr): name(name), room_model_ptr(std::move(model_ptr)){
+
+        room_model_ptr->add(name);
 
         // check for any existing rooms using sql query
 
@@ -22,7 +24,15 @@ private:
         std::cout << "You created the room: " << name << std::endl;
     }
 
+    void save(const std::string& room_name) override {
+        room_model_ptr->map_insert(room_name, shared_from_this());
+        room_model_ptr->add(room_name);
+    }
+
+
 public:
+
+    typedef boost::shared_ptr<Chat_Room> chat_room_ptr;
 
     void broadcast(const std::string& msg) override {
         std::cout << connections.size() << std::endl;
@@ -31,55 +41,54 @@ public:
         }
     }
 
-    static room_ptr create_room(const std::string& room_name, Model::model_ptr model_ptr) {
-        // need to check if room name already exists
-        return room_ptr((Room *)(new Chat_Room(room_name, std::move(model_ptr))));
-
+    static void pipe(Chat_User::user_ptr user,const std::string& msg)  {
+        std::move(user)->write(msg);
     }
 
-    void add_user(const boost::shared_ptr<Chat_User>& client_ptr) override {
+    static chat_room_ptr create_room(const std::string& room_name, Model::model_ptr model_ptr) {
+        // need to check if room name already exists
+        chat_room_ptr c((new Chat_Room(room_name, std::move(model_ptr))));
+        c->save(room_name);
+        return c;
+    }
+
+
+
+    void add_user(const boost::shared_ptr<Chat_User> client_ptr) override {
+        broadcast("A new user has joined " + name + "!");
+        pipe(client_ptr, "<" + name + ">" + " You have joined " + name + "!");
         connections.push_back(client_ptr);
     }
 //
-//    room_ptr get_shared() {
-//        return shared_from_this();
-//    }
 
 
 
-
-    std::string get_name() {
+    std::string get_name() override {
         return name;
     }
 
-//    void move_room(Connection::conn_ptr client, std::string room_name) {
-//        // call remove_user() for current room
-//
-//        // proceed to add user to new room
-//
-//        room_ptr room = server.get_room(room_name);
-//        room->add_user(client);
-//    }
-
-//    void create_room) {
-//        // need to check if room name already exists
-//        Chat_Room::room_ptr new_room(new Chat_Room(room_name, server));
-//
-//        room_map[new_room->get_name()] = new_room;
-//
-//        remove_user(client);
-//        new_room->add_user(client);
-//    }
+    Room::room_ptr move_room(Chat_User::user_ptr client, const std::string& room_name) override {
+        // call remove_user() for current room
+        remove_user(client->get_parent_shared());
+        // proceed to add user to new room
+        room_ptr room = room_model_ptr->get_room(room_name);
+        room->add_user(client);
+        return room;
+    }
 
 
+    Room::room_ptr get_shared() override {
+        return boost::static_pointer_cast<Room>(shared_from_this());
+    }
 
-    void remove_user(Connection::conn_ptr client) {
+    void remove_user(const Chat_User::user_ptr client) override {
 
-        // for (int i = 0; i < connections.size(); i++) {
-        //     if (connections[i] == client) {
-        //         connections[i].pop();
-        //     }
-        // }
+        for (auto it = connections.begin(); it != connections.end(); it++) {
+            if (*it == client) {
+                connections.erase(it);
+                break;
+            }
+        }
     }
 
 

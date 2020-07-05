@@ -47,9 +47,15 @@ public:
 
     void write_success();
 
-    ~Connection() {
+    Chat_User::user_ptr get_parent_shared() override;
 
-//        room->remove_user(*this);
+    void move_room(const std::string& new_room_name) {
+        room = room->move_room(boost::static_pointer_cast<Chat_User>(shared_from_this()), new_room_name);
+    }
+
+    ~Connection() {
+        std::cout << "Closing connection" << std::endl;
+        room->remove_user(boost::static_pointer_cast<Chat_User>(shared_from_this()));
         socket.close();
     }
 

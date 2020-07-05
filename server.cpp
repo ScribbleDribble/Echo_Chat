@@ -3,14 +3,17 @@
     void Server::accept() {
         // init landing room
         Model::model_ptr model_ptr = Room_Model::create_model();
-        Room::room_ptr room = Chat_Room::create_room("Index", model_ptr);
 
+        Chat_Room::chat_room_ptr room = Chat_Room::create_room("Index", model_ptr);
+        Room::room_ptr rm = room->get_shared();
+        //TEST ROOM
+        Room::room_ptr room2 = Chat_Room::create_room("Test", model_ptr);
         try {
             
             while(true) {
                 boost::system::error_code ec;
 
-                // give connection access to server contents
+                // give connection access to IO and rooms
                 Connection::conn_ptr client_ptr = Connection::create_connection(io_context, room);
                 listening_socket.accept(client_ptr->get_socket());
 

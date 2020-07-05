@@ -16,6 +16,8 @@ public:
 
     virtual void write(std::string msg) = 0;
 
+    virtual user_ptr get_parent_shared() = 0;
+
     virtual void start_read() = 0;
 
 };

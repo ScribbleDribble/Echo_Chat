@@ -8,6 +8,7 @@
 #endif //CHAT_APP_MODEL_H
 #include "sqlite3.h"
 #include <boost/shared_ptr.hpp>
+#include "room.h"
 
 class DB {
 private:
@@ -87,4 +88,6 @@ public:
     virtual void add(const std::string&) = 0;
     virtual void remove(const std::string&) = 0;
 
+    virtual void map_insert(const std::string& room_name, Room::room_ptr room) = 0;
+    virtual Room::room_ptr get_room(const std::string&) = 0;
 };

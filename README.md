@@ -1,4 +1,4 @@
-#Chat Application
+##Echo Chat
 
 Echo Chat is a simple terminal chat application which focuses 
 on user customisation. 
@@ -10,29 +10,29 @@ on user customisation.
 `sudo apt-get install libsqlite3-dev
 `
 
-## Running The App
+## Running Echo
 
 In the root directory of the project, run the following
 commands in the terminal.
 
-Build project by typing
+Build the project
 
 `cmake CMakeLists.txt`
 
 `make`
 
-Run server by entering
+Run server 
 
 `./server <port num> `
 
-Compile client 
+Compile client and run client 
 
 `g++ client.cpp -o client -lpthread`
 
-Run client
-
 `./client <port num>`
 
-### Summary
-Communication is non-blocking and
-threads are used for accepting new connections.
+
+## Summary
+- Non-blocking communication.
+
+- Threads used for accepting new connections.

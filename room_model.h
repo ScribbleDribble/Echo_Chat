@@ -15,7 +15,7 @@ class Room_Model : public Model{
 private:
 
 
-    std::map<int, Room::room_ptr> house_map;
+    std::map<std::string, Room::room_ptr> house_map;
 
     std::string name;
     int id{};
@@ -25,8 +25,11 @@ private:
 public:
     typedef boost::shared_ptr<Room_Model> room_model_ptr;
 
-    void add(const std::string&) override ;
-    void remove(const std::string&) override ;
+    void add(const std::string&) override;
+    void remove(const std::string&) override;
+    void map_insert(const std::string& room_name, Room::room_ptr room);
+    Room::room_ptr get_room(const std::string&) override ;
     static Model::model_ptr create_model();
+
 
 };

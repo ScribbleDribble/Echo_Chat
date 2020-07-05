@@ -38,7 +38,7 @@ public:
     }
 
 
-    void queue_msg(std::string msg) {
+    void enqueue(const std::string msg) {
         msg_queue.push_back(msg);
     }
 
@@ -74,15 +74,15 @@ public:
             /*Do Stuff*/
 //            boost::asio::async_read_until(socket, buf, "#", boost::bind(&Client::handle_read, this));
 
-            if (!msg_queue.empty()) {
-                std::cout << "\n" << "<You> " << msg_queue[0] << std::endl;
+            if (!msg_queue.empty() && msg_queue[0] != "/move Test") {
+                std::cout << "<You> " << msg_queue[0] << std::endl;
                 msg_queue.pop_front();
             }
             else {
+                // Print message received from the server if not from self
                 std::string msg = Message::get_string_from_buf(buf);
-                std::cout << msg << std::endl;
+                std::cout << Message::remove_delimiter(msg) << std::endl;
             }
-//
             handle_read();
 
 
@@ -127,12 +127,10 @@ int main(int argc, char *argv[]) {
             buf.consume(buf.size());
 
             user_message = msg;
-            client.queue_msg(user_message);
+            client.enqueue(user_message);
 
             client.get_ostream() << user_message.append("#");
 
-
-//            client.write();
             client.do_write();
             if (ec == boost::asio::error::eof) {
                 std::cerr << "eof error, closing." << std::endl;
