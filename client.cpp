@@ -18,6 +18,7 @@ private:
     std::ostream os;
     boost::asio::io_context& io;
 
+    Message message;
 
     std::deque<std::string> msg_queue;
 
@@ -73,18 +74,20 @@ public:
 //            }
             /*Do Stuff*/
 //            boost::asio::async_read_until(socket, buf, "#", boost::bind(&Client::handle_read, this));
-
-            if (!msg_queue.empty() && msg_queue[0] != "/move Test") {
+            if (!msg_queue.empty() && !message.command_exists(msg_queue[0])) {
                 std::cout << "<You> " << msg_queue[0] << std::endl;
                 msg_queue.pop_front();
             }
             else {
+                if (!msg_queue.empty() && message.command_exists(msg_queue[0])) {
+                    msg_queue.pop_front();
+                }
                 // Print message received from the server if not from self
                 std::string msg = Message::get_string_from_buf(buf);
                 std::cout << Message::remove_delimiter(msg) << std::endl;
+
             }
             handle_read();
-
 
         } else {
             /*Error handling*/
@@ -115,7 +118,6 @@ int main(int argc, char *argv[]) {
         std::cout << "Connected" << std::endl;
 
         std::string user_message;
-
 
         char msg[Message::max_body_size + 1];
         boost::system::error_code ec;

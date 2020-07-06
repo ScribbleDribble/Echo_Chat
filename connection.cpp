@@ -12,18 +12,14 @@ void Connection::start_read() {
             if (!ec) {
                 std::string msg = Message::get_string_from_buf(read_buffer);
 
-                // TODO dedicated function for initiating user commands
-                if(msg.substr(0,5) == std::string("/move")) {
-                    Message::remove_delimiter(msg);
-                    room = room->move_room(boost::static_pointer_cast<Chat_User>(shared_from_this()), Message::find_name(msg));
-                    std::cout << "MADE IT" << std::endl;
+                if (msg[0] == '/' && m.command_exists(msg)) {
+                    run_command(msg);
                 }
 
                 else {
                     Message::remove_delimiter(msg);
                     room->broadcast(msg);
                 }
-
                 read_buffer.consume(read_buffer.size());
             }
 
@@ -31,16 +27,13 @@ void Connection::start_read() {
                 std::cout << "User disconnected" << std::endl;
             }
 
-
             // FREEZES
             // boost::asio::async_read_until(socket, read_buffer, "#", boost::bind(&Connection::handle_read, this));
             // io_context.run();
 
             // POTENTIAL FIX?
-            // boost::asio::async_read_until(socket, read_buffer, "#", boost::bind(&Connection::handle_read, shared_from_this());
+            // boost::asio::async_read_until(socket, read_buffer, "#", boost::bind(&Connection::start_read shared_from_this());
             }
-            // room.broadcast(msg);
-
     }
     catch(std::exception& e) {
         std::cout << e.what() << std::endl;
@@ -48,14 +41,49 @@ void Connection::start_read() {
 
 }
 
+void Connection::run_command(const std::string &cmd) {
+    std::string last_cmd = m.get_last_command();
+    if (last_cmd == "move") {
+        move_room(Message::find_name(cmd));
+    }
+
+    else if (last_cmd == "create_room") {
+        create_room(Message::find_name(cmd));
+    }
+
+    else {
+        write("<Server> Command not found");
+    }
+
+}
+void Connection::move_room(const std::string& new_room_name) {
+    Room::room_ptr temp = room->move_room(boost::static_pointer_cast<Chat_User>(shared_from_this()), new_room_name);
+    if (temp != nullptr) {
+        room = temp;
+    }
+    else {
+        write("<Server> Room not found");
+    }
+}
+
+void Connection::create_room(const std::string& new_room_name) {
+    Room::room_ptr temp = room->create_room(boost::static_pointer_cast<Chat_User>(shared_from_this()), new_room_name);
+    if (temp != nullptr) {
+        room = temp;
+    }
+    else {
+        write("<Server> Failed to create room");
+    }
+}
+
 void Connection::write(std::string msg) {
+    std::cout << msg << std::endl;
     boost::system::error_code ec;
     boost::asio::streambuf buf;
     std::ostream os(&buf);
     buf.consume(buf.size());
 
 
-    std::cout <<"| "<< msg << std::endl;
     os << msg.append("#");
     boost::asio::async_write(socket, boost::asio::buffer(buf.data(),
             msg.size()),boost::bind(&Connection::write_success, shared_from_this()));

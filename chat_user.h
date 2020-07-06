@@ -20,6 +20,8 @@ public:
 
     virtual void start_read() = 0;
 
+    virtual void run_command(const std::string& cmd) = 0;
+
 };
 
 #endif //CHAT_APP_CHAT_USER_H

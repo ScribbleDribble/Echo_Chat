@@ -27,6 +27,7 @@ public:
 
     void add(const std::string&) override;
     void remove(const std::string&) override;
+    bool exists(const std::string& room_name) override;
     void map_insert(const std::string& room_name, Room::room_ptr room);
     Room::room_ptr get_room(const std::string&) override ;
     static Model::model_ptr create_model();

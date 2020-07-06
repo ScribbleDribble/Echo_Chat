@@ -21,6 +21,7 @@ private:
     tcp::socket socket;
     boost::asio::io_context& io_context;
     Room::room_ptr room;
+    Message m;
 
     Connection(boost::asio::io_context& io_context, Room::room_ptr room): socket(io_context),
                                                                       io_context(io_context), room(std::move(room)){};
@@ -49,9 +50,9 @@ public:
 
     Chat_User::user_ptr get_parent_shared() override;
 
-    void move_room(const std::string& new_room_name) {
-        room = room->move_room(boost::static_pointer_cast<Chat_User>(shared_from_this()), new_room_name);
-    }
+    void move_room(const std::string& new_room_name);
+    void create_room(const std::string& new_room_name);
+    void run_command(const std::string& cmd) override ;
 
     ~Connection() {
         std::cout << "Closing connection" << std::endl;

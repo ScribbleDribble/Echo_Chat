@@ -6,8 +6,7 @@
 
         Chat_Room::chat_room_ptr room = Chat_Room::create_room("Index", model_ptr);
         Room::room_ptr rm = room->get_shared();
-        //TEST ROOM
-        Room::room_ptr room2 = Chat_Room::create_room("Test", model_ptr);
+
         try {
             
             while(true) {

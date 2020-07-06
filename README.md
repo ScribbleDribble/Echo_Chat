@@ -1,4 +1,4 @@
-##Echo Chat
+## Echo Chat
 
 Echo Chat is a simple terminal chat application which focuses 
 on user customisation. 
@@ -15,19 +15,16 @@ on user customisation.
 In the root directory of the project, run the following
 commands in the terminal.
 
-Build the project
+1| Build the project.
+
 
 `cmake CMakeLists.txt`
 
 `make`
 
-Run server 
+ 2| Run the server and client executables.
 
 `./server <port num> `
-
-Compile client and run client 
-
-`g++ client.cpp -o client -lpthread`
 
 `./client <port num>`
 
@@ -36,3 +33,7 @@ Compile client and run client
 - Non-blocking communication.
 
 - Threads used for accepting new connections.
+
+- User can create and join rooms.
+
+![Alt text](echo_chat.png)

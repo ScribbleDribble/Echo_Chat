@@ -17,7 +17,7 @@ private:
 
         room_model_ptr->add(name);
 
-        // check for any existing rooms using sql query
+        // check for any existing rooms
 
         // otherwise proceed to insert room into table
 
@@ -46,34 +46,40 @@ public:
     }
 
     static chat_room_ptr create_room(const std::string& room_name, Model::model_ptr model_ptr) {
-        // need to check if room name already exists
-        chat_room_ptr c((new Chat_Room(room_name, std::move(model_ptr))));
+        chat_room_ptr c(new Chat_Room(room_name, std::move(model_ptr)));
         c->save(room_name);
         return c;
     }
 
-
+    Chat_Room::room_ptr create_room(const Chat_User::user_ptr user, const std::string& room_name) override {
+        // room creation based on user cmd
+        if (room_model_ptr->exists(room_name)) {
+            return nullptr;
+        }
+        create_room(room_name, room_model_ptr);
+        return move_room(user, room_name);
+    }
 
     void add_user(const boost::shared_ptr<Chat_User> client_ptr) override {
         broadcast("A new user has joined " + name + "!");
         pipe(client_ptr, "<" + name + ">" + " You have joined " + name + "!");
         connections.push_back(client_ptr);
     }
-//
-
-
 
     std::string get_name() override {
         return name;
     }
 
     Room::room_ptr move_room(Chat_User::user_ptr client, const std::string& room_name) override {
-        // call remove_user() for current room
-        remove_user(client->get_parent_shared());
-        // proceed to add user to new room
-        room_ptr room = room_model_ptr->get_room(room_name);
-        room->add_user(client);
-        return room;
+        if (room_model_ptr->exists(room_name)) {
+            remove_user(client);
+
+            room_ptr room = room_model_ptr->get_room(room_name);
+            room->add_user(client);
+            return room;
+        }
+
+        return nullptr;
     }
 
 

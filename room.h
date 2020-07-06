@@ -7,7 +7,6 @@
 #include <boost/asio.hpp>
 #include "chat_user.h"
 
-
 class Room {
 private:
     virtual void save(const std::string& room_name) = 0;
@@ -23,7 +22,10 @@ public:
 
     virtual room_ptr move_room(Chat_User::user_ptr, const std::string& room_name) = 0;
 
+    virtual room_ptr create_room(const Chat_User::user_ptr user, const std::string& room_name) = 0;
+
     virtual room_ptr get_shared() = 0;
+
 
     virtual std::string get_name() = 0;
 };
