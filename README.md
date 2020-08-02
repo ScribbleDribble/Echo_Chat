@@ -30,7 +30,7 @@ commands in the terminal.
 
 
 ## Summary
-- Non-blocking communication.
+- Asynchronous communication.
 
 - Threads used for accepting new connections.
 
